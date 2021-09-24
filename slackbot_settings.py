@@ -1,5 +1,5 @@
-API_TOKEN = "xoxb-572457194997-2532056937649-kyDEzA3DOjFQGEK8JWWZln2y"
+import settings
 
-DEFAULT_REPLY = "Git Statsです。「今日」 or 「○日前」 と入力してください。"
-
-PLUGINS = ['plugins']
+API_TOKEN = settings.SLACK_API_TOKEN
+DEFAULT_REPLY = 'Git Commit Count Bot です'
+PLUGINS = ['slack']
