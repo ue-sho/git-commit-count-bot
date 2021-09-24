@@ -10,9 +10,6 @@ from slackbot.bot import (
 )
 
 
-# GITHUB_ACCESS_TOKEN = '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'
-
-
 def iso_to_jstdt(iso_str):
     dt = None
     try:
