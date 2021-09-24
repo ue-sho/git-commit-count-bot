@@ -1,4 +1,1 @@
-slackbot
-PyGithub
 pytz
-graphene>=2.0

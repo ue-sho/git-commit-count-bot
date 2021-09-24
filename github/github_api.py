@@ -17,7 +17,7 @@ def post(query):
     return res
 
 
-def query():
+def python_star_ranking():
     # query
     query={ 'query' : """
       query {
