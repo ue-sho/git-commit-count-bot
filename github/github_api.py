@@ -1,6 +1,5 @@
 import datetime
 
-import pytz
 import requests
 
 import settings

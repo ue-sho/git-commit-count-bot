@@ -54,7 +54,6 @@ def every_day_at_0am_task():  # slackに送信
 
     print("from {} to {} ".format(dt_from, dt_to))
 
-
     res = get_commit_count(user_name, dt_from, dt_to)
     slack_text = "{}さんの{}のコミット数は {} です。".format(
         res['data']['user']['name'],
@@ -93,8 +92,7 @@ def every_day_at_8pm_task():  # Lineに送信
 
 
 def main():
-    every_day_at_0am_task()
-    # schedule.every().days.at("00:00").do(every_day_at_0am_task)
+    schedule.every().days.at("00:00").do(every_day_at_0am_task)
     # schedule.every().days.at("20:00").do(every_day_at_8pm_task)
 
 
