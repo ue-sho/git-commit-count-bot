@@ -19,6 +19,6 @@ class SlackAPI:
         res = requests.post(self.END_POINT + 'chat.postMessage',
                             headers=self._headers,
                             data=data)
-        print("return ", res.json())
+        print("SlackAPI send_message return ", res.json())
 
 
