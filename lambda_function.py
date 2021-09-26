@@ -91,11 +91,12 @@ def every_day_at_8pm_task():  # Lineに送信
     pass
 
 
-def main():
+def lambda_handler(event, context):
     print("git commit count bot start")
-    schedule.every().days.at("00:05").do(every_day_at_0am_task)
+    every_day_at_0am_task()
+    # schedule.every().days.at("00:05").do(every_day_at_0am_task)
     # schedule.every().days.at("20:00").do(every_day_at_8pm_task)
 
 
 if __name__ == "__main__":
-    main()
+    lambda_handler(None, None)
