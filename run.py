@@ -92,7 +92,8 @@ def every_day_at_8pm_task():  # Lineに送信
 
 
 def main():
-    schedule.every().days.at("00:00").do(every_day_at_0am_task)
+    print("git commit count bot start")
+    schedule.every().days.at("00:05").do(every_day_at_0am_task)
     # schedule.every().days.at("20:00").do(every_day_at_8pm_task)
 
 
