@@ -7,17 +7,31 @@ on:
 
 jobs:
   lambda-cd:
+    name: Zip the code to be deployed to AWS Lambda
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - run: pip3 install requests dotenv -t ./
-      - run: zip -r package.zip ./*
-      - run: pip3 install awscli
-      - run: aws lambda update-function-code --function-name <Lambda関数名> --zip-file fileb://package.zip --publish
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-1
+
+      - name: Zip the code
+        run: |
+          pip3 install -r requirements.txt -t ./
+          zip -r package.zip ./*
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+      - name: deploy to AWS Lambda
+        run: |
+          aws cloudformation deploy \
+            --template-file cloudformation/lambda.yml \
+            --stack-name git-commit-count-bot-cfn
