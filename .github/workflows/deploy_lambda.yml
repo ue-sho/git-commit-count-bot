@@ -32,6 +32,7 @@ jobs:
 
       - name: deploy to AWS Lambda
         run: |
+          aws s3 cp package.zip s3://cf-templates-8nc3s3g6xnli-ap-northeast-1/ --acl public-read
           aws cloudformation deploy \
             --template-file cloudformation/lambda.yml \
             --stack-name git-commit-count-bot-cfn
