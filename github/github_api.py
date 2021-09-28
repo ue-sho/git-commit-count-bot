@@ -1,7 +1,4 @@
-import datetime
-
 import requests
-
 import settings
 
 

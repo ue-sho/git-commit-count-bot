@@ -1,6 +1,6 @@
 import requests
-
 import settings
+
 
 class SlackAPI:
     END_POINT = 'https://slack.com/api/'
@@ -20,5 +20,3 @@ class SlackAPI:
                             headers=self._headers,
                             data=data)
         print("SlackAPI send_message return ", res.json())
-
-

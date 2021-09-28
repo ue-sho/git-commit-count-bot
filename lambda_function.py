@@ -1,11 +1,7 @@
-import json
 import datetime
 
-import requests
-import schedule
-
-from slack.slack_api import SlackAPI
 from github.github_api import GitHubAPI
+from slack.slack_api import SlackAPI
 
 
 def get_commit_count(user_name, dt_from, dt_to):
@@ -71,31 +67,11 @@ def every_day_at_0am_task():  # slackに送信
 
 
 def every_day_at_8pm_task():  # Lineに送信
-    # user_name = "ue-sho"
-    # dt_from = "2021-09-10T00:00:00"
-    # dt_to = "2021-09-15T00:00:00"
-
-    # res = get_commit_count(user_name, dt_from, dt_to)
-    # slack_text = "{}さんの今日のコミット数は {} です。".format(
-    #     res['data']['user']['name'],
-    #     res['data']['user']['contributionsCollection']['totalCommitContributions']
-    # )
-
-    # for data in res['data']['user']['contributionsCollection']['commitContributionsByRepository']:
-    #     slack_text += "\n* {}: {}".format(
-    #         data['repository']['nameWithOwner'],
-    #         data['contributions']['totalCount']
-    #     )
-    # slack = SlackAPI()
-    # slack.send_message("#times_uesho", slack_text)
     pass
 
 
 def lambda_handler(event, context):
-    print("git commit count bot start")
     every_day_at_0am_task()
-    # schedule.every().days.at("00:05").do(every_day_at_0am_task)
-    # schedule.every().days.at("20:00").do(every_day_at_8pm_task)
 
 
 if __name__ == "__main__":
