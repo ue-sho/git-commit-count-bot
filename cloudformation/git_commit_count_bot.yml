@@ -18,8 +18,8 @@ Resources:
       Runtime: python3.9
       Environment:
         Variables:
-          GITHUB_ACCESS_TOKEN: ${GitHubAccessToken}
-          SLACK_API_TOKEN: ${SlackApiToken}
+          GITHUB_ACCESS_TOKEN: !Ref GitHubAccessToken
+          SLACK_API_TOKEN: !Ref SlackApiToken
       Code:
         ZipFile: |
           def lambda_handler(event, context):
