@@ -9,6 +9,8 @@ jobs:
   lambda-cd:
     name: Zip the code to be deployed to AWS Lambda
     runs-on: ubuntu-latest
+    env:
+      ZIP_FILE_NAME: package.zip
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -21,7 +23,7 @@ jobs:
       - name: Zip the code
         run: |
           pip3 install -r requirements.txt -t ./
-          zip -r package.zip ./*
+          zip -r ${{ env.ZIP_FILE_NAME }} ./*
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -31,8 +33,17 @@ jobs:
           aws-region: ap-northeast-1
 
       - name: deploy to AWS Lambda
+        env:
+          TEMPLATE_FILE: cloudformation/git_commit_count_bot.yml
+          STACK_NAME: git-commit-count-bot-cfn
+          LAMBDA_FUNCTION_NAME: git-commit-count-bot
         run: |
-          aws s3 cp package.zip s3://cf-templates-8nc3s3g6xnli-ap-northeast-1/ --acl public-read
           aws cloudformation deploy \
-            --template-file cloudformation/lambda.yml \
-            --stack-name git-commit-count-bot-cfn
+            --template-file $TEMPLATE_FILE \
+            --stack-name $STACK_NAME
+            --parameter-overrides \
+            GITHUB_ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} \
+            SLACK_API_TOKEN=${{ secrets.SLACK_API_TOKEN }}
+          aws lambda update-function-code \
+            --function-name $LAMBDA_FUNCTION_NAME \
+            --zip-file fileb://${{ env.ZIP_FILE_NAME }} --publish

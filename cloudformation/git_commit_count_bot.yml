@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Lambda for git commit count bot
+
+Parameters:
+  GITHUB_ACCESS_TOKEN:
+    Type: String
+  SLACK_API_TOKEN:
+    Type: String
+
+Resources:
+  GitCommitCountBotLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: git-commit-count-bot-test
+      Handler : lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.9
+      Environment:
+        Variables:
+          GITHUB_ACCESS_TOKEN: ${GITHUB_ACCESS_TOKEN}
+          SLACK_API_TOKEN: ${SLACK_API_TOKEN}
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              print('dummy')
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: git-commit-count-bot-role
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - '*'
+
+  CloudWatchEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: schedule-every-day-0am-event
+      ScheduleExpression: cron(5 15 * * ? *) # 日本時間で 0:05
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt GitCommitCountBotLambda.Arn
+          Id: git-commit-count-bot-lambda
+
+  LambdaEventPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref GitCommitCountBotLambda
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt CloudWatchEventRule.Arn
