@@ -3,23 +3,23 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Lambda for git commit count bot
 
 Parameters:
-  GITHUB_ACCESS_TOKEN:
+  GitHubAccessToken:
     Type: String
-  SLACK_API_TOKEN:
+  SlackApiToken:
     Type: String
 
 Resources:
   GitCommitCountBotLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: git-commit-count-bot-test
+      FunctionName: git-commit-count-bot
       Handler : lambda_function.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.9
       Environment:
         Variables:
-          GITHUB_ACCESS_TOKEN: ${GITHUB_ACCESS_TOKEN}
-          SLACK_API_TOKEN: ${SLACK_API_TOKEN}
+          GITHUB_ACCESS_TOKEN: ${GitHubAccessToken}
+          SLACK_API_TOKEN: ${SlackApiToken}
       Code:
         ZipFile: |
           def lambda_handler(event, context):
