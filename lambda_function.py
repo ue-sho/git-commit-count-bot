@@ -51,13 +51,14 @@ def every_day_at_0am_task():  # slackに送信
     print("from {} to {} ".format(dt_from, dt_to))
 
     res = get_commit_count(user_name, dt_from, dt_to)
+    commit_data = res['data']['user']['contributionsCollection']
     slack_text = "{}さんの{}のコミット数は {} です。".format(
         res['data']['user']['name'],
         yesterday.date(),
-        res['data']['user']['contributionsCollection']['totalCommitContributions']
+        commit_data['totalCommitContributions']
     )
 
-    for data in res['data']['user']['contributionsCollection']['commitContributionsByRepository']:
+    for data in commit_data['commitContributionsByRepository']:
         slack_text += "\n・ {}: {}".format(
             data['repository']['nameWithOwner'],
             data['contributions']['totalCount']
