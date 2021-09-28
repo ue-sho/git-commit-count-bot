@@ -22,7 +22,8 @@ jobs:
 
       - name: Zip the code
         run: |
-          pip3 install -r requirements.txt -t ./
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t ./
           zip -r ${{ env.ZIP_FILE_NAME }} ./*
 
       - name: Configure AWS credentials
