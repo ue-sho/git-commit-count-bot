@@ -1,11 +1,11 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import lambda_function
 
 
-@patch('lambda_function.SlackAPI.send_message')
+@patch('lambda_function.SlackAPI')
 @patch('lambda_function.get_commit_count')
-def test_get_commit_count(get_commit_count, send_message):
+def test_get_commit_count(get_commit_count, slack_mock):
     get_commit_count.return_value = {
         'data': {
             'user': {
@@ -25,6 +25,7 @@ def test_get_commit_count(get_commit_count, send_message):
             }
         }
     }
+
     slack_res = {
         'ok': True,
         'channel': 'CV7ANQBMZ',
@@ -51,7 +52,9 @@ def test_get_commit_count(get_commit_count, send_message):
             }
         }
     }
-    send_message.return_value = slack_res
+    slack_instance = MagicMock()
+    slack_instance.send_message.return_value = slack_res
+    slack_mock.return_value = slack_instance
 
     dt_from, dt_to = lambda_function.get_isoformat_time_a_day_ahead()
     res = lambda_function.notify_slack_of_commit_count(dt_from, dt_to)
