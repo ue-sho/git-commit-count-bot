@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta, timezone
 
 from github.github_api import GitHubAPI
 from slack.slack_api import SlackAPI
@@ -40,21 +40,28 @@ def get_commit_count(user_name, dt_from, dt_to):
     return res.json()
 
 
-def every_day_at_0am_task():  # slackに送信
-    now = datetime.datetime.now()
-    yesterday = now + datetime.timedelta(days=-1)
+def get_isoformat_time_a_day_ahead():
+    jst = timezone(timedelta(hours=+9), 'JST')
 
-    user_name = "ue-sho"
+    now = datetime.now(jst)
+    yesterday = now + timedelta(days=-1)
+
     dt_from = str(yesterday.isoformat())
     dt_to = str(now.isoformat())
-
     print("from {} to {} ".format(dt_from, dt_to))
 
+    return dt_from, dt_to
+
+
+def notify_commit_count(dt_from, dt_to):  # slackに送信
+
+    user_name = "ue-sho"
     res = get_commit_count(user_name, dt_from, dt_to)
     commit_data = res['data']['user']['contributionsCollection']
-    slack_text = "{}さんの{}のコミット数は {} です。".format(
+    slack_text = "{}さんの {} ~ {} のコミット数は {} です。".format(
         res['data']['user']['name'],
-        yesterday.date(),
+        dt_from.strftime("%Y/%m/%d %H:%M"),
+        dt_to.strftime("%Y/%m/%d %H:%M"),
         commit_data['totalCommitContributions']
     )
 
@@ -67,13 +74,9 @@ def every_day_at_0am_task():  # slackに送信
     slack.send_message("#times_uesho", slack_text)
 
 
-def every_day_at_8pm_task():  # Lineに送信
-    pass
-
-
 def lambda_handler(event, context):
-    every_day_at_0am_task()
+    print("event: ", event)
+    print("context: ", context)
 
-
-if __name__ == "__main__":
-    lambda_handler(None, None)
+    dt_from, dt_to = get_isoformat_time_a_day_ahead()
+    notify_commit_count(dt_from, dt_to)
