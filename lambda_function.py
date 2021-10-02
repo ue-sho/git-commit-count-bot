@@ -4,39 +4,33 @@ from github.github_api import GitHubAPI
 from slack.slack_api import SlackAPI
 
 
-def get_commit_count(user_name, dt_from, dt_to):
-    # query
-    contributions_query = """
-        query (
-            $name: String!,
-            $from: DateTime!,
-            $to: DateTime!
-        ) {
-            user(login: $name) {
-                name
-                contributionsCollection(from: $from, to: $to) {
-                    totalRepositoryContributions
-                    totalCommitContributions
-                    commitContributionsByRepository {
-                        repository {
-                            nameWithOwner
-                        }
-                        contributions {
-                            totalCount
-                        }
+def get_commit_count(date):
+    commit_count_query = """
+        query($date: GitTimestamp!) {
+          viewer {
+            repositories(last: 100) {
+              nodes {
+                nameWithOwner
+                defaultBranchRef {
+                  target {
+                    ... on Commit {
+                      history(since: $date) {
+                          totalCount
+                      }
                     }
+                  }
                 }
+              }
             }
+          }
         }
     """
     variables = {
-        "name": user_name,
-        "from": dt_from,
-        "to": dt_to
+        "date": date
     }
 
     github = GitHubAPI()
-    res = github.post(contributions_query, variables)
+    res = github.post(commit_count_query, variables)
     return res.json()
 
 
@@ -46,31 +40,41 @@ def get_isoformat_time_a_day_ahead():
     now = datetime.now(jst)
     yesterday = now + timedelta(days=-1)
 
-    dt_from = str(yesterday.isoformat())
-    dt_to = str(now.isoformat())
-    print("from {} to {} ".format(dt_from, dt_to))
+    yesterday_iso = str(yesterday.isoformat())
+    print("from {} ".format(yesterday_iso))
 
-    return dt_from, dt_to
+    return yesterday_iso
 
 
-def notify_slack_of_commit_count(dt_from, dt_to):
+def notify_slack_of_commit_count(date):
 
-    user_name = "ue-sho"
-    res = get_commit_count(user_name, dt_from, dt_to)
+    res = get_commit_count(date)
 
-    commit_data = res['data']['user']['contributionsCollection']
+    repo_date = res['data']['viewer']['repositories']['nodes']
 
-    slack_text = "{}さんの {} ~ {} のコミット数は {} です。".format(
-        res['data']['user']['name'],
-        dt_from.replace('-', '/').replace('T', ' ')[:16],
-        dt_to.replace('-', '/').replace('T', ' ')[:16],
-        commit_data['totalCommitContributions']
-    )
-    for data in commit_data['commitContributionsByRepository']:
-        slack_text += "\n・ {}: {}".format(
-            data['repository']['nameWithOwner'],
-            data['contributions']['totalCount']
+    total_commit_count = 0
+    slack_detail_text = ''
+    for data in repo_date:
+        nameWithOwner = data['nameWithOwner']
+        if nameWithOwner == 'ue-sho/ue-sho':
+            continue
+
+        commit_count = data['defaultBranchRef']['target']['history']['totalCount']
+        if commit_count == 0:
+            continue
+
+        total_commit_count += commit_count
+        slack_detail_text += "\n・ {}: {}".format(
+            nameWithOwner,
+            commit_count
         )
+
+    slack_text = "{}からのコミット数は {} です。".format(
+        date.replace('-', '/').replace('T', ' ')[:16],
+        total_commit_count
+    )
+    slack_text += slack_detail_text
+    print(slack_text)
 
     slack = SlackAPI()
     res = slack.send_message("#times_uesho", slack_text)
@@ -82,5 +86,9 @@ def lambda_handler(event, context):
     print("event: ", event)
     print("context: ", context)
 
-    dt_from, dt_to = get_isoformat_time_a_day_ahead()
-    notify_slack_of_commit_count(dt_from, dt_to)
+    date = get_isoformat_time_a_day_ahead()
+    notify_slack_of_commit_count(date)
+
+
+if __name__ == '__main__':
+    lambda_handler(None, None)
