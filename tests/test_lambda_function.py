@@ -79,18 +79,18 @@ def test_notify_slack_of_commit_count(get_commit_count, slack_mock):
 
     slack_res = {
         'ok': True,
-        'channel': 'CV7ANQBMZ',
-        'ts': '1633014323.022000',
+        'channel': 'test_channel',
+        'ts': 'test_tss',
         'message': {
-            'bot_id': 'B02G8NZ0UG0',
+            'bot_id': 'test_bot_id',
             'type': 'message',
             'text': 'ueshoさんの2021-09-29のコミット数は 1 です。\n・ ue-sho/git-commit-count-bot: 1',
-            'user': 'U02FG48E06R',
-            'ts': '1633014323.022000',
-            'team': 'TGUDF5QVB',
+            'user': 'test_user',
+            'ts': 'test_tss',
+            'team': 'test_team',
             'bot_profile': {
-                'id': 'B02G8NZ0UG0',
-                'app_id': 'A02FK1ETM5H',
+                'id': 'test_bot_id',
+                'app_id': 'test_app_id',
                 'name': 'git_commit_count',
                 'icons': {
                     'image_36': 'https://avatars.slack-edge.com/2021-09-24/2537963772132_1c2cee321ddf22fe9fef_36.png',
@@ -98,8 +98,8 @@ def test_notify_slack_of_commit_count(get_commit_count, slack_mock):
                     'image_72': 'https://avatars.slack-edge.com/2021-09-24/2537963772132_1c2cee321ddf22fe9fef_72.png'
                 },
                 'deleted': False,
-                'updated': 1632549837,
-                'team_id': 'TGUDF5QVB'
+                'updated': test_updated,
+                'team_id': 'test_team'
             }
         }
     }
