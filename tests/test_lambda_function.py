@@ -98,7 +98,7 @@ def test_notify_slack_of_commit_count(get_commit_count, slack_mock):
                     'image_72': 'https://avatars.slack-edge.com/2021-09-24/2537963772132_1c2cee321ddf22fe9fef_72.png'
                 },
                 'deleted': False,
-                'updated': test_updated,
+                'updated': 'test_updated',
                 'team_id': 'test_team'
             }
         }
