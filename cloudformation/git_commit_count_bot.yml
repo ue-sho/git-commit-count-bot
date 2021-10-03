@@ -55,7 +55,7 @@ Resources:
     Type: AWS::Events::Rule
     Properties:
       Name: schedule-every-day-0am-event
-      ScheduleExpression: cron(5 15 * * ? *) # 日本時間で 0:05
+      ScheduleExpression: cron(0 15 * * ? *) # 日本時間で 0:00
       State: ENABLED
       Targets:
         - Arn: !GetAtt GitCommitCountBotLambda.Arn
